@@ -1,0 +1,62 @@
+﻿@inject NavigationManager NavigationManager;
+@inject IConfiguration Configuration;
+@inject IStringLocalizer<App> localizer
+        <!-- Languages Dropdown Menu -->
+<li class="nav-item dropdown">
+    <a class="nav-link" data-toggle="dropdown" href="#">
+        <i class='flag-icon flag-icon-@drapeau'></i>
+    </a>
+    <div class="dropdown-menu dropdown-menu-right p-0">
+        <a href="#" class="dropdown-item" @onclick='(() => RequestCultureChange("en-US"))'>
+            <i class="flag-icon flag-icon-us mr-2" id="en"></i> @localizer["English"]
+        </a>
+        <a href="#" class="dropdown-item" @onclick='(() => RequestCultureChange("fr-FR"))'>
+            <i class="flag-icon flag-icon-fr mr-2" id="fr"></i>  @localizer["French"]
+        </a>
+    </div>
+</li>
+
+@code {
+    private string drapeau { get; set; } = "us";
+    private string selectedCulture = System.Threading.Thread.CurrentThread.CurrentCulture.Name;
+    private Dictionary<string, string>
+    cultures;
+
+    protected override void OnInitialized()
+    {
+        cultures = Configuration.GetSection("Cultures")
+        .GetChildren().ToDictionary(x => x.Key, x => x.Value);
+
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (selectedCulture.Contains("fr"))
+        {
+            drapeau = "fr";
+        }
+
+        if (selectedCulture.Contains("us"))
+        {
+            drapeau = "us";
+        }
+
+    }
+
+    private void RequestCultureChange(string selectedCulture)
+    {
+        if (string.IsNullOrEmpty(selectedCulture))
+        {
+            return;
+        }
+
+        var uri = new Uri(NavigationManager.Uri)
+            .GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+        var query = $"?culture={Uri.EscapeDataString(selectedCulture)}&" +
+                    $"redirectionUri={Uri.EscapeDataString(uri)}";
+
+        NavigationManager.NavigateTo("/Culture/SetCulture" + query, forceLoad: true);
+    }
+}
+
+

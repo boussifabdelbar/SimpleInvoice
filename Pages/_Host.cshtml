@@ -1,8 +1,12 @@
 ﻿@page "/"
 @namespace SimpleInvoice.Pages
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+@using Microsoft.AspNetCore.Localization
 @{
     Layout = null;
+
 }
 
 <!DOCTYPE html>
@@ -11,25 +15,54 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SimpleInvoice</title>
-    <base href="~/" />
-    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
-    <link href="css/site.css" rel="stylesheet" />
-    <link href="SimpleInvoice.styles.css" rel="stylesheet" />
-</head>
-<body>
-    <component type="typeof(App)" render-mode="ServerPrerendered" />
 
-    <div id="blazor-error-ui">
-        <environment include="Staging,Production">
-            An error has occurred. This application may no longer respond until reloaded.
-        </environment>
-        <environment include="Development">
-            An unhandled exception has occurred. See browser dev tools for details.
-        </environment>
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
-    </div>
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.3.0/css/flag-icon.min.css">
+    <link rel="stylesheet" href="~/AdminLte/css/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="~/AdminLte/css/icheck-bootstrap/icheck-bootstrap.min.css">
+    <link rel="stylesheet" href="~/AdminLte/css/jqvmap/jqvmap.min.css">
+    <link rel="stylesheet" href="~/AdminLte/css/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+    <link rel="stylesheet" href="~/AdminLte/css/adminlte.min.css">
+    <link rel="stylesheet" href="~/AdminLte/css/overlayScrollbars/css/OverlayScrollbars.min.css">
+    <link rel="stylesheet" href="~/AdminLte/css/daterangepicker/daterangepicker.css">
+    <link rel="stylesheet" href="~/AdminLte/css/summernote/summernote-bs4.css">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+
+
+    <script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+    <script src="~/AdminLTE/plugins/jquery-ui/jquery-ui.min.js"></script>
+    <script>
+        $.widget.bridge('uibutton', $.ui.button)
+    </script>
+    <script src="~/AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/AdminLTE/plugins/chart.js/Chart.min.js"></script>
+    <script src="~/AdminLTE/plugins/sparklines/sparkline.js"></script>
+    <script src="~/AdminLTE/plugins/jqvmap/jquery.vmap.min.js"></script>
+    <script src="~/AdminLTE/plugins/jqvmap/maps/jquery.vmap.usa.js"></script>
+    <script src="~/AdminLTE/plugins/jquery-knob/jquery.knob.min.js"></script>
+    <script src="~/AdminLTE/plugins/moment/moment.min.js"></script>
+    <script src="~/AdminLTE/plugins/daterangepicker/daterangepicker.js"></script>
+    <script src="~/AdminLTE/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+    <script src="~/AdminLTE/plugins/summernote/summernote-bs4.min.js"></script>
+    <script src="~/AdminLTE/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+    <script src="~/AdminLTE/js/adminlte.js"></script>
+    <script src="~/AdminLTE/js/pages/dashboard.js"></script>
+    <script src="~/AdminLTE/js/demo.js"></script>
+    @{
+       
+    }
+
+    <app>
+        @(await Html.RenderComponentAsync<SimpleInvoice.App>(RenderMode.ServerPrerendered))
+    </app>
 
     <script src="_framework/blazor.server.js"></script>
+
 </body>
 </html>
+
+
+

@@ -1,20 +1,19 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using SimpleInvoice.Areas.Identity;
-using SimpleInvoice.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using SimpleInvoice.Data;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Http;
 
 namespace SimpleInvoice
 {
@@ -25,31 +24,49 @@ namespace SimpleInvoice
             Configuration = configuration;
         }
 
+        private RequestLocalizationOptions GetGlobalizationOptions()
+        {
+            var cultures = Configuration.GetSection("Cultures")
+                .GetChildren().ToDictionary(x => x.Key, x => x.Value);
+            var defaultCulture = cultures.FirstOrDefault().Key;
+            var cc = new RequestLocalizationOptions();
+            var supportedCultures = cultures.Keys.ToArray();
+            var requestLocalizationOptions = new RequestLocalizationOptions();
+            requestLocalizationOptions.AddSupportedCultures(supportedCultures);
+            requestLocalizationOptions.AddSupportedUICultures(supportedCultures);
+            requestLocalizationOptions.SetDefaultCulture(defaultCulture);
+
+            return requestLocalizationOptions;
+        }
+
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
-            services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddSingleton<WeatherForecastService>();
+
+            #region Localization
+
+            services.AddControllers();
+            services.AddLocalization(option => option.ResourcesPath = "Resources");
+            
+            #endregion 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            #region Localization
+            app.UseRequestLocalization(GetGlobalizationOptions());
+            #endregion
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseMigrationsEndPoint();
             }
             else
             {
@@ -63,12 +80,11 @@ namespace SimpleInvoice
 
             app.UseRouting();
 
-            app.UseAuthentication();
-            app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
+                #region Localization
                 endpoints.MapControllers();
+                #endregion
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });

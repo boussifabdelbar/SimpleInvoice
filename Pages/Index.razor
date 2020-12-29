@@ -1,7 +1,68 @@
 ﻿@page "/"
+@using Microsoft.Extensions.Localization
+@inject NavigationManager NavigationManager
 
-<h1>Hello, world!</h1>
+<h1>@(localizer["titleIndex"])</h1>
 
-Welcome to your new app.
+@(localizer["welcomeMsg"])
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+
+<select @onchange="OnSelected">
+    <option>choisissez...</option>
+    <option class="flag-icon flag-icon-fr mr-2" value="fr-FR">Français</option>
+    <option class="flag-icon flag-icon-us" value="en-US">English</option>
+</select>
+<!-- Languages Dropdown Menu -->
+<li class="nav-item dropdown">
+    <a class="nav-link" data-toggle="dropdown" href="#">
+        <i class="flag-icon flag-icon-us"></i>
+    </a>
+    <div class="dropdown-menu dropdown-menu-right p-0">
+        <a href="#" class="dropdown-item active" @onclick='(() => RequestCultureChange("en-US"))'>
+            <i class="flag-icon flag-icon-us mr-2" id="en" ></i> English
+        </a>
+        <a href="#" class="dropdown-item active" @onclick='(() => RequestCultureChange("fr-FR"))'>
+            <i class="flag-icon flag-icon-fr mr-2" id="fr" ></i> French
+        </a>
+    </div>
+</li>
+
+@*<li class="nav-item dropdown">
+        <div class="dropdown-menu" aria-labelledby="languageSelector">
+        <a class="dropdown-item" href="#fr" @onclick='(() => RequestCultureChange("fr-FR"))'><span class="flag-icon flag-icon-fr"></span>French</a>
+        <a class="dropdown-item active" href="#en" @onclick='(() => RequestCultureChange("fr-FR"))'><span class="flag-icon flag-icon-en"></span>English</a>
+    </div>
+</li>*@
+
+@code {
+    [Inject] public IStringLocalizer<Index> localizer { get; set; }
+    private string selectedCulture = System.Threading.Thread.CurrentThread.CurrentCulture.Name;
+
+    void OnSelected(ChangeEventArgs e)
+    {
+        var culture = (string)e.Value;
+        var uri = new Uri(NavigationManager.Uri)
+            .GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+        var query = $"?culture={Uri.EscapeDataString(culture)}&" +
+                    $"redirectionUri={Uri.EscapeDataString(uri)}";
+
+        NavigationManager.NavigateTo("/Culture/SetCulture" + query, forceLoad: true);
+    }
+
+    private void RequestCultureChange(string selectedCulture)
+    {
+
+        if (string.IsNullOrEmpty(selectedCulture))
+        {
+            return;
+        }
+        var uri = new Uri(NavigationManager.Uri)
+            .GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+        var query = $"?culture={Uri.EscapeDataString(selectedCulture)}&" +
+                    $"redirectionUri={Uri.EscapeDataString(uri)}";
+
+        NavigationManager.NavigateTo("/Culture/SetCulture" + query, forceLoad: true);
+    }
+
+
+}
